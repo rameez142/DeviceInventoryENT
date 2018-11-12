@@ -1,0 +1,364 @@
+<div class="container">
+  <form method="post" enctype="multipart/form-data">
+
+<header class="pageHeader">
+  <h3><i class="fa fa-handshake-o fa-lg page-caption" aria-hidden="true"></i> الأحوال</h3>
+</header>
+
+                <dx-data-grid
+                id="gridContainer"
+                [dataSource]="dataSource"
+                [showBorders]="true"
+                [rtlEnabled]="true"
+                [hoverStateEnabled]="true"
+                [selectedRowKeys]="[]"
+                (onToolbarPreparing)="onToolbarPreparing($event)"
+                (onRowPrepared)="onRowPrepared($event)"
+                (onRowClick)="Rwclick($event)"
+                (onContextMenuPreparing)= "onContextMenuprepare($event)"
+              >
+                <dxo-paging [pageSize]="80"></dxo-paging>
+                <dxo-pager
+                [showPageSizeSelector]="true"
+                [allowedPageSizes]="[80, 50, 10]"
+                [showInfo]="true">
+            </dxo-pager>
+            <!-- onContextMenuPreparing)= "onContextMenuprepare($event)"  -->
+
+            <dxo-export [enabled]="true" fileName="Vehicle"></dxo-export>
+
+            <dxo-header-filter
+            [visible]="true"></dxo-header-filter>
+            <dxo-column-chooser [enabled]="true" mode="select"></dxo-column-chooser>
+
+            <dxo-grouping [autoExpandAll]="true"></dxo-grouping>
+            <dxo-filter-row [visible]="true"></dxo-filter-row>
+            <dxo-header-filter [visible]="true"></dxo-header-filter>
+
+            <dx-load-panel
+                #loadPanel
+                shadingColor="rgba(0,0,0,0.4)"
+                [position]="{ of: '#gridContainer' }"
+                [(visible)]="loadingVisible"
+                [showIndicator]="true"
+                [showPane]="true"
+                [shading]="true"
+                [closeOnOutsideClick]="false"
+                (onShown)="onShown()">
+            </dx-load-panel>
+
+            <dxi-column dataField="sectordesc" [groupIndex]="1" caption="القطاع"></dxi-column>
+            <dxi-column dataField="milnumber" caption="الرقم العسكري"></dxi-column>
+            <dxi-column dataField="rankdesc" [groupIndex]="2" caption="الرتبه"></dxi-column>
+            <dxi-column dataField="personname" caption="الاسم"></dxi-column>
+            <dxi-column dataField="callerid" caption="النداء"></dxi-column>
+            <dxi-column dataField="platenumber"  caption="الدورية"></dxi-column>
+            <dxi-column dataField="sunrisetimestamp" caption="شروق"></dxi-column>
+            <dxi-column dataField="sunsettimestamp" caption="غروب"></dxi-column>
+            <dxi-column dataField="personmobile" caption="الجوال"></dxi-column>
+            <dxi-column dataField="laststatechangetimestamp" caption="وقت الحالة"></dxi-column>
+            <dxi-column dataField="personstate" caption="الحالة"></dxi-column>
+            <dxi-column  caption=""  [allowFiltering]="false" [width]="50" cellTemplate="maptemplate" ></dxi-column>
+            <div *dxTemplate="let data of 'maptemplate'">
+                 <img (click)="showmapInfo()" src="../../../../assets/images/haritayikaydir_r_glow.png"   />
+               <!-- <a  routerLink="/map" > <img src="../../../../assets/images/haritayikaydir_r_glow.png"  /></a> -->
+                </div>
+
+              </dx-data-grid>
+
+              <div class="modal-sample" >
+                <modal id="custom-modal-1"   >
+                    <div class="modal-popup" >
+
+                    <div class="modal-body"  >
+                        <MOI-Map></MOI-Map>
+                    </div>
+                  </div>
+
+                    <div class="modal-background"></div>
+                </modal>
+              </div>
+              <!-- <dx-popup  [(visible)]="mappopupVisible">
+
+              </dx-popup> -->
+
+              <dx-popup
+              class="popup"
+              [width]="600"
+              [height]="350"
+              [showTitle]="true"
+              title=""
+              [showCloseButton]= "true"
+              [dragEnabled]="true"
+              [closeOnOutsideClick]="true"
+              [(visible)]="popupVisible">
+              <div *dxTemplate="let data of 'content'">
+
+                  <table class="greyGridTable">
+                      <tr>
+                          <td><label>الفرد</label></td>
+                          <td>
+                                <dx-drop-down-box
+                                [(value)]="selectPerson_Mno"
+                                valueExpr="milnumber"
+                                [deferRendering]="false"
+                                [displayExpr]="person_displayExpr"
+                                placeholder="Select a value..."
+                                [showClearButton]="true"
+                                [dataSource]="personsrc"
+                        >
+                            <div *dxTemplate="let data of 'content'">
+                                <dx-data-grid
+                                        [dataSource]="personsrc"
+                                        [columns]="[{caption:'الرقم العسكري',dataField:'milnumber'},{caption:'الاسم',dataField:'name'}]"
+                                        [selection]="{ mode: 'single' }"
+                                        [hoverStateEnabled]="true"
+                                        [paging]="{ enabled: true, pageSize: 5 }"
+                                        [filterRow]="{ visible: true }"
+                                        [rtlEnabled]= "true"
+                                        [keyExpr] ="personid"
+                                        [focusStateEnabled]="true"
+                                        (onRowClick)="RwPopupClick($event)"
+                                >
+
+                                </dx-data-grid>
+                                </div>
+                            </dx-drop-down-box>
+                          </td>
+
+                          </tr>
+                          <tr>
+
+
+                          <td><label>المسؤولية</label></td>
+                          <td>
+                            <dx-select-box
+                            [dataSource]="responsibilitysrc"
+                            displayExpr="name"
+                            valueExpr="patrolRoleID"
+                            [searchEnabled]="true"
+                            (onValueChanged)="roleSelection($event)"
+                            [value]="selectedRole"
+                            >
+                        </dx-select-box>
+                        </td>
+
+                        </tr>
+
+                 <tr>
+                     <td><label >الشفت</label></td>
+                     <td>
+                            <dx-select-box
+                            [dataSource]="shiftssrc"
+                            displayExpr="name"
+                            valueExpr="shiftID"
+                            [visible]="shiftvisibile"
+                            [searchEnabled]="true"
+                            [(value)]="selectedShift"
+                            >
+                        </dx-select-box>
+                     </td>
+                     <td></td>
+                     </tr>
+                     <tr>
+                     <td><label>القطاع</label></td>
+                     <td>  <dx-select-box
+                        [dataSource]="sectorssrc"
+                        displayExpr="shortName"
+                        valueExpr="sectorID"
+                        [visible]="sectorvisibile"
+                        (onValueChanged)="sectorSelection($event)"
+                        [searchEnabled]="true"
+                        [value]="selectedSector"
+                        >
+                    </dx-select-box></td>
+                    </tr>
+                    <tr>
+                     <td><label>المنطقة</label></td>
+                     <td>
+                            <dx-select-box
+                            [dataSource]="citysrc"
+                            displayExpr="shortName"
+                            valueExpr="cityGroupID"
+                            [visible]="cityvisibile"
+                            [searchEnabled]="true"
+                            [(value)]="selectedCity"
+                            >
+                        </dx-select-box>
+                     </td>
+                 </tr>
+                 <tr>
+                     <td><label>مرافق ل</label></td>
+                     <td>
+                            <dx-drop-down-box
+                            [(value)]="associatePersonMno"
+                            [dataSource]="associatesrc"
+                            [deferRendering]="false"
+                            [displayExpr]="associateExpr"
+                            placeholder="Select a value..."
+                            [showClearButton]="true"
+                            valueExpr="milnumber"
+                    >
+
+                        <div *dxTemplate="let data of 'content'">
+                            <dx-data-grid
+                                    [dataSource]="associatesrc"
+                                    [columns]="[{caption:'الرقم العسكري',dataField:'milnumber'},{caption:'الاسم',dataField:'name'}]"
+                                    [selection]="{ mode: 'single' }"
+                                        [hoverStateEnabled]="true"
+                                        [paging]="{ enabled: true, pageSize: 5 }"
+                                        [filterRow]="{ visible: true }"
+                                        [rtlEnabled]= "true"
+                                        [keyExpr] ="personid"
+                                        [focusStateEnabled]="true"
+                                        (onRowClick)="RwAssociatePopupClick($event)"
+
+                            >
+                            </dx-data-grid>
+                        </div>
+                    </dx-drop-down-box>
+                     </td>
+                 </tr>
+                     <tr>
+                         <td>
+                        <button type="submit" (click)="AhwalMapping_Add_SubmitButton_Click($event)" data-dismiss="modal" class="btn btn-primary">أضافه</button>
+
+                    </td>
+
+
+                     </tr>
+              <tr>
+                  <td colspan="2">
+                       <div class="errormsg"> {{ahwalMapping_Add_status_label}} </div>
+                  </td>
+              </tr>
+                </table>
+              </div>
+          </dx-popup>
+
+          <dx-popup
+          class="popup"
+          [width]="600"
+          [height]="500"
+          [showTitle]="true"
+          title=""
+          [showCloseButton]= "true"
+          [dragEnabled]="false"
+          [closeOnOutsideClick]="true"
+          [showCloseButton]= "true"
+          [(visible)]="checkInOutPopupVisible">
+          <div *dxTemplate="let data of 'content'">
+<table>
+  <tr><td><label>الفرد</label></td>
+  <td>
+    <dx-drop-down-box
+    [(value)]="selCheckInOutPersonMno"
+    [dataSource]="associatesrc"
+    [deferRendering]="false"
+    [displayExpr]="checkInassociateExpr"
+    placeholder="Select a value..."
+    [showClearButton]="true"
+    valueExpr="milnumber"
+>
+
+<div *dxTemplate="let data of 'content'">
+    <dx-data-grid
+            [dataSource]="associatesrc"
+            [columns]="[{caption:'الرقم العسكري',dataField:'milnumber'},{caption:'الاسم',dataField:'name'}]"
+            [selection]="{ mode: 'single' }"
+                [hoverStateEnabled]="true"
+                [paging]="{ enabled: true, pageSize: 5 }"
+                [filterRow]="{ visible: true }"
+                [rtlEnabled]= "true"
+                [keyExpr] ="personid"
+                [focusStateEnabled]="true"
+                (onRowClick)="RwPersonCheckPopupClick($event)"
+
+    >
+    </dx-data-grid>
+</div>
+</dx-drop-down-box>
+
+  </td>
+  <tr>
+    <td>
+        <label>الدورية</label>
+    </td>
+    <td>
+            <dx-drop-down-box
+            [(value)]="selCheckInOutPatrolPltNo"
+            [dataSource]="patrolCarsrc"
+            [deferRendering]="false"
+            [displayExpr]="checkPatrolExp"
+            placeholder="Select a value..."
+            [showClearButton]="true"
+            valueExpr="platenumber"
+             [searchEnabled]="true"
+        >
+        
+        <div *dxTemplate="let data of 'content'">
+            <dx-data-grid
+                    [dataSource]="patrolCarsrc"
+                    [columns]="[{caption:'رقم اللوحة',dataField:'platenumber'},{caption:'الموديل',dataField:'model'}]"
+                    [selection]="{ mode: 'single' }"
+                        [hoverStateEnabled]="true"
+                        [paging]="{ enabled: true, pageSize: 5 }"
+                        [filterRow]="{ visible: true }"
+                        [rtlEnabled]= "true"
+                        [keyExpr] ="patrolid"
+                        [focusStateEnabled]="true"
+                        (onRowClick)="RwPatrolCheckPopupClick($event)">
+            </dx-data-grid>
+        </div>
+        </dx-drop-down-box>
+    </td>
+    
+  </tr>
+  <tr>
+    <td><label>الجهاز</label></td>
+    <td>  <dx-drop-down-box
+        [(value)]="selCheckInOutHHeldSerialNo"
+        [dataSource]="handHeldsrc"
+        [displayExpr]="checkhandheldexpr"
+        valueExpr="serial"
+        [searchEnabled]="true">
+    
+
+    <div *dxTemplate="let data of 'content'">
+        <dx-data-grid
+                [dataSource]="handHeldsrc"
+                [columns]="[{caption:'رقم اللوحة',dataField:'serial'},{caption:'باركود',dataField:'barcode'}]"
+                [selection]="{ mode: 'single' }"
+                [hoverStateEnabled]="true"
+                [paging]="{ enabled: true, pageSize: 5 }"
+                 [filterRow]="{ visible: true }"
+                 [rtlEnabled]= "true"
+                 [keyExpr] ="handheldid"
+                [focusStateEnabled]="true"
+                (onRowClick)="RwHandHeldCheckPopupClick($event)"
+        >
+        </dx-data-grid>
+    </div>
+    </dx-drop-down-box></td>
+    
+  </tr>
+  <tr>
+    <td colspan="2">
+      <label>{{ahwalMapping_CheckInOut_StatusLabel}}</label>
+    </td>
+  </tr>
+<tr>
+  <td>
+    <button type="submit" (click)="AhwalMapping_CheckInButton_Click($event)" data-dismiss="modal" class="btn btn-primary">أضافه</button>
+  </td>
+</tr>
+</table>
+            </div>
+            </dx-popup>
+            <div [ngStyle]="{'display': styleExp}">
+            <app-menu-container (onMenuBtnClicked)="WingSelected($event)"  (onWingSelected)="WingSelected2($event)" [options]="options" [gutter]="gutter" [startAngles]="startAngles" [wings]="wings">
+
+            </app-menu-container>
+          </div>
+          </form>
+</div>

@@ -1,0 +1,52 @@
+ <div class="container">
+  <header class="pageHeader">
+    <h3><i class="fa fa-tachometer fa-lg page-caption" aria-hidden="true"></i> {{'pageHeader.Dashboard' | translate}}</h3>
+  </header>
+  <div [@fadeInOut]>
+    <div class="col-sm-6 col-set-default">
+      <button type="button" (click)="showCallerPopup('custom-modal-1')" class="btn btn-primary">
+        <i class='fa fa-hdd-o'></i> Manual Popup
+      </button>
+      <button type="button" (click)="Bootstrappopup()" class="btn btn-primary">
+        <i class='fa fa-hdd-o'></i> Bootstrap Popu
+      </button>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <hr class="last-separator-hr" />
+      </div>
+    </div>
+    <div *ngIf="configurations.showDashboardNotifications" class="row bottom-space">
+      <button type="button" class="close pull-right todo-close-btn" aria-label="Close" title="Close" (click)="configurations.showDashboardNotifications = false">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <div class="clearfix"></div>
+      <notifications-viewer></notifications-viewer>
+    </div>
+    <div class="modal-sample">
+
+      <modal id="custom-modal-1">
+       
+        <div class="modal-popup" >
+          <div class="modal-body">
+            <h1>CALLER DETAILS</h1>
+            <p>
+              CALLER ID 1245 ON THE LINE
+            </p>
+           
+            <button (click)="closeModal('custom-modal-1');">LAND</button>
+            <button (click)="closeModal('custom-modal-1');">SEA</button>
+            <button (click)="closeModal('custom-modal-1');">SUNRISE</button>
+            <button (click)="closeModal('custom-modal-1');">EMERGENCY</button>
+          </div>
+        </div>
+        <div class="modal-background"></div>
+      </modal>
+
+
+    </div>
+  </div>
+</div> 
+
+
+  
